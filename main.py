@@ -10,6 +10,7 @@ from static_entity import StaticEntity
 pygame.init()
 window = width, height = (640, 480)
 windowSurface = pygame.display.set_mode(window)
+clock = pygame.time.Clock()
 
 walkLeftAnim = pyganim.PygAnimation(
     [('resources/duderunleft/duderunleft0.tiff', 0.1),
@@ -106,3 +107,4 @@ while True:
 
     # Swap the buffers
     pygame.display.flip()
+    clock.tick(60)
