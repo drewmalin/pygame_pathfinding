@@ -10,3 +10,10 @@ class StaticEntity:
 
     def draw(self, surface):
         pygame.draw.rect(surface, (255, 255, 255), self.rect, 1)
+
+    def nodes(self):
+        nodes = []
+        for y in range(self.pos[1] - self.h / 2, self.pos[1] + self.h / 2):
+            for x in range(self.pos[0] - self.w / 2, self.pos[0] + self.w / 2):
+                nodes.append((int(x), int(y)))
+        return nodes

@@ -2,7 +2,7 @@ import pygame
 import sys
 import pyganim
 import random
-from astar import AStar, AStarMap
+from astar import PathManager
 
 from pygame.locals import *
 from static_entity import StaticEntity
@@ -63,12 +63,16 @@ anim = walkFrontAnim
 debug_path = []
 path = None
 obstacles = []
+blocked_nodes = []
 debug = True
 # generate obstacles
 for i in range(80):
     o = StaticEntity([random.randint(0, width), random.randint(0, height)], random.randint(10, 50), random.randint(10, 50))
     obstacles.append(o)
-map = AStarMap(obstacles)
+
+    for node in o.nodes():
+        blocked_nodes.append(node)
+path_manager = PathManager(obstacles=blocked_nodes)
 
 while True:
     for event in pygame.event.get():
@@ -77,8 +81,8 @@ while True:
             sys.exit()
         elif event.type == MOUSEBUTTONDOWN and event.button == 1:
             target = event.pos
-            # test astar
-            path = AStar.generate((current[0], current[1]), (target[0], target[1]), map)
+            path = path_manager.generate_path((current[0], current[1]),
+                                              (target[0], target[1]))
             debug_path = path.get_path()
 
     # Clear screen
@@ -86,10 +90,10 @@ while True:
 
     # test astar
     if debug and path:
-        for pos in path.get_closed_list():
-            pygame.draw.circle(windowSurface, (255, 0, 0), pos, 1, 1)
-        for pos in path.get_open_list():
-            pygame.draw.circle(windowSurface, (255, 255, 0), pos, 1, 1)
+        for node in path.get_closed_nodes():
+            pygame.draw.circle(windowSurface, (255, 0, 0), node, 1, 1)
+        for node in path.get_open_nodes():
+            pygame.draw.circle(windowSurface, (255, 255, 0), node, 1, 1)
 
     if len(debug_path) > 1:
         pygame.draw.lines(windowSurface, (0, 255, 0), False, debug_path, 1)
