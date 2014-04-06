@@ -55,10 +55,10 @@ class PathManager:
 
 class Path:
     def __init__(self):
-        self.open_set = {}
-        self.closed_set = {}
-        self.g_set = {}
-        self.f_set = {}
+        self.open_set = set()
+        self.closed_set = set()
+        self.g = {}
+        self.f = {}
         self.parent = {}
 
         self.path = []
@@ -78,44 +78,44 @@ class Path:
         return self.path
 
     def get_open_nodes(self):
-        return self.open_set.keys()
+        return [node for node in self.open_set]
 
     def get_closed_nodes(self):
-        return self.closed_set.keys()
+        return [node for node in self.closed_set]
 
     def add_open_set(self, node):
-        self.open_set[node] = 1
+        self.open_set.add(node)
 
     def remove_open_set(self, node):
-        self.open_set.pop(node)
+        self.open_set.remove(node)
 
     def contains_open_set(self, node):
         return node in self.open_set
 
     def add_closed_set(self, node):
-        self.closed_set[node] = 1
+        self.closed_set.add(node)
     
     def remove_closed_set(self, node):
-        self.closed_set.pop(node)
+        self.closed_set.remove(node)
 
     def contains_closed_set(self, node):
         return node in self.closed_set
 
     def get_g(self, node):
-        if node in self.g_set:
-            return self.g_set[node]
+        if node in self.g:
+            return self.g[node]
         return float("inf")
 
     def set_g(self, node, value):
-        self.g_set[node] = value
+        self.g[node] = value
 
     def get_f(self, node):
-        if node in self.f_set:
-            return self.f_set[node]
+        if node in self.f:
+            return self.f[node]
         return 0
 
     def set_f(self, node, value):
-        self.f_set[node] = value
+        self.f[node] = value
     
     def set_parent(self, child_tile, parent_tile):
         self.parent[child_tile] = parent_tile
@@ -127,7 +127,7 @@ class Path:
 
     def first_open_node(self):
         return sorted(self.open_set, 
-            key=lambda x: self.f_set[x] if x in self.f_set else float("inf"))[0] 
+            key=lambda x: self.f[x] if x in self.f else float("inf"))[0] 
 
     def close_enough(self, from_node, to_node):
         dx = int(from_node[0] - to_node[0])
