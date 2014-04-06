@@ -139,12 +139,12 @@ class PathMap:
     def __init__(self, w, h):
         self.w = w
         self.h = h
-        self.blocked_nodes = {}
+        self.blocked_nodes = set()
 
     def update_blocked_nodes(self, nodes):
-        self.blocked_nodes = {}
+        self.blocked_nodes = set()
         for node in nodes:
-            self.blocked_nodes[node] = 1
+            self.blocked_nodes.add(node)
 
     def get_neighbor_nodes(self, node, step=1):
         neighbor_nodes = []
