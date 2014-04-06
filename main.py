@@ -73,6 +73,8 @@ for i in range(80):
 
     for node in o.nodes():
         blocked_nodes.append(node)
+
+# create manager to handle all pathing requests
 path_manager = PathManager(obstacles=blocked_nodes)
 
 while True:
