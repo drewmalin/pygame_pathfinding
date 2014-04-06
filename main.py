@@ -65,6 +65,7 @@ path = None
 obstacles = []
 blocked_nodes = []
 debug = True
+
 # generate obstacles
 for i in range(80):
     o = StaticEntity([random.randint(0, width), random.randint(0, height)], random.randint(10, 50), random.randint(10, 50))

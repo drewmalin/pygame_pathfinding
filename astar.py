@@ -18,10 +18,10 @@ class PathManager:
         
     @staticmethod
     def dist_heuristic(from_node, to_node):
-        dx = int(from_node[0] - to_node[0])
-        dy = int(from_node[1] - to_node[1])
+        dx = int(math.fabs(from_node[0] - to_node[0]))
+        dy = int(math.fabs(from_node[1] - to_node[1]))
         return dx ** 2 + dy ** 2
-    
+
     @staticmethod
     def dist(from_node, to_node):
         dx = int(math.fabs(from_node[0] - to_node[0]))
@@ -31,6 +31,7 @@ class PathManager:
     def generate_path(self, from_node, to_node):
         path = Path()
         path.add_open_set(from_node)
+        path.set_g(from_node, 0)
         if to_node in self.path_map.blocked_nodes:
             return path.construct(from_node)
         while len(path.open_set) > 0:
@@ -41,16 +42,14 @@ class PathManager:
                 if path.contains_closed_set(neighbor_node):
                     continue
                 if path.close_enough(neighbor_node, to_node):
-                    path.set_parent(neighbor_node, to_node)
+                    path.set_parent(neighbor_node, context_node)
                     return path.construct(neighbor_node)
                 temp_cost = path.get_g(context_node) + PathManager.dist(context_node, neighbor_node)
-                if not path.contains_open_set(neighbor_node):
+                if temp_cost < path.get_g(neighbor_node):
                     path.add_open_set(neighbor_node)
-                else:
-                    if temp_cost < path.get_g(neighbor_node):
-                        path.set_parent(neighbor_node, context_node)
-                path.set_g(neighbor_node, temp_cost)
-                path.set_f(neighbor_node, path.get_g(neighbor_node) + PathManager.dist_heuristic(neighbor_node, to_node))
+                    path.set_parent(neighbor_node, context_node)
+                    path.set_g(neighbor_node, temp_cost)
+                    path.set_f(neighbor_node, path.get_g(neighbor_node) + PathManager.dist_heuristic(neighbor_node, to_node))
         return path.construct(from_node)
 
 
@@ -67,13 +66,11 @@ class Path:
     def construct(self, tile=None):
         if not tile:
             return self.path
-
         self.path.append(tile)
         parent = self.get_parent(tile)
         while parent:
             self.path.append(parent)
             parent = self.get_parent(parent)
-
         self.path.reverse()
         return self
 
@@ -98,13 +95,16 @@ class Path:
     def add_closed_set(self, node):
         self.closed_set[node] = 1
     
+    def remove_closed_set(self, node):
+        self.closed_set.pop(node)
+
     def contains_closed_set(self, node):
         return node in self.closed_set
 
     def get_g(self, node):
         if node in self.g_set:
             return self.g_set[node]
-        return 0
+        return float("inf")
 
     def set_g(self, node, value):
         self.g_set[node] = value
@@ -127,7 +127,7 @@ class Path:
 
     def first_open_node(self):
         return sorted(self.open_set, 
-            key=lambda x: self.f_set[x] if x in self.f_set else 9999)[0] 
+            key=lambda x: self.f_set[x] if x in self.f_set else float("inf"))[0] 
 
     def close_enough(self, from_node, to_node):
         dx = int(from_node[0] - to_node[0])
